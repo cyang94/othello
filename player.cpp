@@ -15,13 +15,16 @@ Player::Player(Side side) {
      * 30 seconds.
      */
 
-    Board b = new Board();
+    *b = new Board();
+    self = side;
+    other = (self == BLACK) ? WHITE : BLACK;
 }
 
 /*
  * Destructor for the player.
  */
 Player::~Player() {
+    delete b;
 }
 
 /*
@@ -37,9 +40,30 @@ Player::~Player() {
  * return NULL.
  */
 Move *Player::doMove(Move *opponentsMove, int msLeft) {
-    /* 
-     * TODO: Implement how moves your AI should play here. You should first
-     * process the opponent's opponents move before calculating your own move
-     */ 
-    return NULL;
+    b.doMove(opponentsMove, other);
+
+    if (b.hasMoves(self))
+    {
+	vector<Move> moves = possibleMoves();
+	return &moves[0];
+    }
+    else
+	return NULL;
+}
+
+
+/*
+ * Populates a list of legal moves possible for player
+ */
+vector<Move> Player::possibleMoves() {
+    vector<Move> moves;
+
+    for (int i = 0; i < 8; i++) {
+	for (int j = 0; j < 8; j++) {
+	    Move move(i, j);
+	    if (b.checkMove(&move, self))
+		moves.push_back(move);
+	}
+    }
+    return moves;
 }
