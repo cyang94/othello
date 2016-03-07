@@ -1,3 +1,12 @@
+/**
+ * @file player.cpp
+ * @author Cassidy Yang and Willis Nguy
+ * @version 1.0
+ * @date March 2016
+ * @copyright This code is in the public domain.
+ *
+ */
+
 #include "player.h"
 
 /*
