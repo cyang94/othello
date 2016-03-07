@@ -24,7 +24,6 @@ Player::Player(Side side) {
      * 30 seconds.
      */
 
-    b = new Board();
     self = side;
     other = (self == BLACK) ? WHITE : BLACK;
 }
@@ -33,7 +32,6 @@ Player::Player(Side side) {
  * Destructor for the player.
  */
 Player::~Player() {
-    delete b;
 }
 
 /*
@@ -50,11 +48,19 @@ Player::~Player() {
  */
 Move *Player::doMove(Move *opponentsMove, int msLeft) 
 {
-    b->doMove(opponentsMove, other);
-    if (b->hasMoves(self))
+    b.doMove(opponentsMove, other);
+    if (b.hasMoves(self))
     {
 	    vector<Move> moves = possibleMoves();
-	    return &moves[0];
+        /*For testing and printing out all possible moves         
+        for (unsigned int i = 0; i < moves.size(); i++)
+        {
+            std::cerr << moves[i].getX() << " " << moves[i].getY() << std::endl;
+        }
+        */ 
+        Move *move = new Move(moves[0].getX(), moves[0].getY());
+        b.doMove(move, self);
+	    return move;
     }
     else
     {
@@ -70,14 +76,19 @@ vector<Move> Player::possibleMoves()
 {
     vector<Move> moves;
 
+    // check for null
+    //b->checkMove(NULL, self);
+    // check for possible moves
     for (int i = 0; i < 8; i++) 
     {
 	    for (int j = 0; j < 8; j++) 
         {
     	    Move move(i, j);
-	        if (b->checkMove(&move, self))
+	        if (b.checkMove(&move, self))
             {
 		        moves.push_back(move);
+                
+                //std::cerr<< i << " " << j <<endl;;
             }
 	    }
     }
