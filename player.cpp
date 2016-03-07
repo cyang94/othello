@@ -24,7 +24,7 @@ Player::Player(Side side) {
      * 30 seconds.
      */
 
-    *b = new Board();
+    b = new Board();
     self = side;
     other = (self == BLACK) ? WHITE : BLACK;
 }
@@ -48,31 +48,38 @@ Player::~Player() {
  * The move returned must be legal; if there are no valid moves for your side,
  * return NULL.
  */
-Move *Player::doMove(Move *opponentsMove, int msLeft) {
-    b.doMove(opponentsMove, other);
-
-    if (b.hasMoves(self))
+Move *Player::doMove(Move *opponentsMove, int msLeft) 
+{
+    b->doMove(opponentsMove, other);
+    if (b->hasMoves(self))
     {
-	vector<Move> moves = possibleMoves();
-	return &moves[0];
+	    vector<Move> moves = possibleMoves();
+	    return &moves[0];
     }
     else
-	return NULL;
+    {
+	    return NULL;
+    }
 }
 
 
 /*
  * Populates a list of legal moves possible for player
  */
-vector<Move> Player::possibleMoves() {
+vector<Move> Player::possibleMoves() 
+{
     vector<Move> moves;
 
-    for (int i = 0; i < 8; i++) {
-	for (int j = 0; j < 8; j++) {
-	    Move move(i, j);
-	    if (b.checkMove(&move, self))
-		moves.push_back(move);
-	}
+    for (int i = 0; i < 8; i++) 
+    {
+	    for (int j = 0; j < 8; j++) 
+        {
+    	    Move move(i, j);
+	        if (b->checkMove(&move, self))
+            {
+		        moves.push_back(move);
+            }
+	    }
     }
     return moves;
 }
