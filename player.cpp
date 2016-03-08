@@ -72,7 +72,7 @@ Move *Player::doMove(Move *opponentsMove, int msLeft)
             for (unsigned int i = 0; i < moves.size(); i++)
             {
                 new_score = minimax(b, moves[i], 2, self);
-		
+		        //std::cerr << "newscore: " << new_score << endl;
                 if (new_score > score)
                 {
                     score = new_score;
@@ -151,7 +151,7 @@ vector<Move*> Player::possibleMoves(Board *board, Side player)
     if (depth == 1)
     {
         copy->doMove(to_move, player);    
-        int final_score = copy->naiveHeuristic(player);
+        int final_score = copy->naiveHeuristic(self);
         delete copy;
         return final_score;
     }
@@ -174,7 +174,7 @@ vector<Move*> Player::possibleMoves(Board *board, Side player)
         {
             // std::cerr << "plays: " << moves[i]->getX() 
 	    //    	      << moves[i]->getY() << std::endl;
-            new_score = -minimax(copy, moves[i], depth-1, other);
+            new_score = minimax(copy, moves[i], depth-1, other);
 
             if (new_score < score)
                 score = new_score;
