@@ -1,4 +1,5 @@
 #include "board.h"
+#include <iostream>
 
 /*
  * Make a standard 8x8 othello board and initialize it to the standard setup.
@@ -180,7 +181,27 @@ void Board::setBoard(char data[]) {
 }
 
 /*
- * Calculates the board Heuristic for the given possible moves
+ * Calculates the board Heuristic score using the difference in pieces.
+ */
+int Board::naiveHeuristic(Side player)
+{
+    int score;
+    // board position score = (# discs player has) - (# discs opponent has);
+    if (player == WHITE)
+    {
+        score = countWhite() - countBlack();
+    }
+    else
+    {
+        score = countBlack() - countWhite();
+    }
+    std::cerr << "current score: " << score << std::endl;
+    return score;
+}
+
+
+/*
+ * Calculates the board Heuristic score for the given possible moves. 
  */
 int Board::doHeuristic(Move *move) 
 { 

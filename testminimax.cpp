@@ -32,20 +32,23 @@ int main(int argc, char *argv[]) {
      * example state.
      */
 
+    player->b->setBoard(boardData);
+
     // Get player's move and check if it's right.
     Move *move = player->doMove(NULL, 0);
 
     if (move != NULL && move->x == 1 && move->y == 1) {
-        printf("Correct move: (1, 1)");
+        printf("Correct move: (1, 1) \n");
     } else {
         printf("Wrong move: got ");
         if (move == NULL) {
-            printf("PASS");
+            printf("PASS"); 
         } else {
             printf("(%d, %d)", move->x, move->y);
         }
         printf(", expected (1, 1)\n");
     }
-
+    delete player;
+    delete board;
     return 0;
 }
