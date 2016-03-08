@@ -58,7 +58,23 @@ Move *Player::doMove(Move *opponentsMove, int msLeft)
             std::cerr << moves[i].getX() << " " << moves[i].getY() << std::endl;
         }
         */ 
+        int score = b.doHeuristic(&moves[0]);
         Move *move = new Move(moves[0].getX(), moves[0].getY());
+        int new_score;
+        std::cerr << "past move: " << move->getX() << " , " << move->getY() << endl;
+        std::cerr << "past score: " << score << endl;
+        for (unsigned int i = 1; i < moves.size(); i++)
+        {
+            new_score = b.doHeuristic(&moves[1]);
+            if (new_score > score)
+            {
+
+                score = new_score;
+                *move = Move(moves[i].getX(), moves[i].getY());
+            } 
+        }
+        std::cerr << "current move: " << move->getX() << " , " << move->getY() << endl;
+        std::cerr << "current score: " << score << endl;
         b.doMove(move, self);
 	    return move;
     }
