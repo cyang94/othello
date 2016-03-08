@@ -187,6 +187,8 @@ int Board::naiveHeuristic(Side player)
 {
     int score;
     // board position score = (# discs player has) - (# discs opponent has);
+    // std::cerr << "current white: " << countWhite() << std::endl;
+    // std::cerr << "current black: " << countBlack() << std::endl;
     if (player == WHITE)
     {
         score = countWhite() - countBlack();
@@ -195,7 +197,7 @@ int Board::naiveHeuristic(Side player)
     {
         score = countBlack() - countWhite();
     }
-    std::cerr << "current score: " << score << std::endl;
+    //std::cerr << "current score: " << score << std::endl;
     return score;
 }
 

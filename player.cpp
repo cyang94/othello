@@ -32,6 +32,8 @@ Player::Player(Side side) {
  * Destructor for the player.
  */
 Player::~Player() {
+    for (unsigned int i = 0; i < moves_made.size(); i++)
+	delete moves_made[i];
     delete b;
 }
 
@@ -52,7 +54,7 @@ Move *Player::doMove(Move *opponentsMove, int msLeft)
     b->doMove(opponentsMove, other);
     if (b->hasMoves(self))
     {
-	    vector<Move> moves = possibleMoves();
+	vector<Move*> moves = possibleMoves(b, self);
 
         /*For testing and printing out all possible moves         
         for (unsigned int i = 0; i < moves.size(); i++)
@@ -63,75 +65,74 @@ Move *Player::doMove(Move *opponentsMove, int msLeft)
 
         int score = -100; //random negative value 
         int new_score;
-        Move *move = new Move(moves[0].getX(), moves[0].getY());
+        Move *move = moves[0];
+
         if (testingMinimax)
         {
             for (unsigned int i = 0; i < moves.size(); i++)
-
             {
-                
-                new_score = minimax(b, &moves[i], 2, self);
-                //std::cerr << "current move: " << moves[i].getX() << " , " << moves[i].getY() << endl;
-                //std::cerr << "final new_score: " << new_score << endl;
+                new_score = minimax(b, moves[i], 2, self);
+		
                 if (new_score > score)
                 {
-
-                    //std::cerr << "final score: " << new_score << endl;
                     score = new_score;
-                    *move = Move(moves[i].getX(), moves[i].getY());
+                    move = moves[i];
                 } 
             }
             b->doMove(move, self);
-            return move;
+	    moves_made.push_back(new Move(move->getX(), move->getY()));
+	    for (unsigned int i = 0; i < moves.size(); i++)
+		delete moves[i];
+            return moves_made.back();
         }
     
-        score = b->doHeuristic(&moves[0]);
-        *move = Move(moves[0].getX(), moves[0].getY());
-        //std::cerr << "past move: " << move->getX() << " , " << move->getY() << endl;
-        //std::cerr << "past score: " << score << endl;
+        score = b->doHeuristic(moves[0]);
+        // *move = Move(moves[0].getX(), moves[0].getY());
+        // std::cerr << "past move: " << move->getX()
+	// 	  << " , " << move->getY() << endl;
+        // std::cerr << "past score: " << score << endl;
         for (unsigned int i = 1; i < moves.size(); i++)
         {
-            new_score = b->doHeuristic(&moves[i]);
+            new_score = b->doHeuristic(moves[i]);
             if (new_score > score)
             {
                 score = new_score;
-                *move = Move(moves[i].getX(), moves[i].getY());
+                move = moves[i];
             } 
         }
-        //std::cerr << "current move: " << move->getX() << " , " << move->getY() << endl;
-        //std::cerr << "current score: " << score << endl;
+
         b->doMove(move, self);
-	    return move;
+	moves_made.push_back(new Move(move->getX(), move->getY()));
+	for (unsigned int i = 0; i < moves.size(); i++)
+	    delete moves[i];
+	return moves_made.back();
     }
     else
     {
-	    return NULL;
+	return NULL;
     }
+
 }
 
 
 /*
  * Populates a list of legal moves possible for player
  */
-vector<Move> Player::possibleMoves() 
+vector<Move*> Player::possibleMoves(Board *board, Side player) 
 {
-    vector<Move> moves;
+    vector<Move*> moves;
 
     // check for null
     //b->checkMove(NULL, self);
     // check for possible moves
     for (int i = 0; i < 8; i++) 
     {
-	    for (int j = 0; j < 8; j++) 
+	for (int j = 0; j < 8; j++) 
         {
-    	    Move move(i, j);
-	        if (b->checkMove(&move, self))
-            {
-		        moves.push_back(move);
-                
-                //std::cerr<< i << " " << j <<endl;;
-            }
-	    }
+    	    Move *move = new Move(i, j);
+	    if (board->checkMove(move, player))
+		moves.push_back(move);
+	}
     }
     return moves;
 }
@@ -142,79 +143,65 @@ vector<Move> Player::possibleMoves()
  */
  int Player::minimax(Board *to_copy, Move *to_move, int depth, Side player)
 {
-    vector<Move> moves;
-    int new_score, score = 0;    
-    if (depth == 0)
+    vector<Move*> moves;
+    int new_score, score = 100;
+    Board *copy = to_copy->copy();
+
+    //std::cerr << "current depth: " << depth << std::endl;
+    if (depth == 1)
     {
-        //Board *copy = to_copy->copy(); 
-        //copy->doMove(to_move, player);    
-        int final_score = to_copy->naiveHeuristic(player);
-        //delete copy;
+        copy->doMove(to_move, player);    
+        int final_score = copy->naiveHeuristic(player);
+        delete copy;
         return final_score;
     }
     
     if (player == self)
     {
-        score = -100;
-        Board *copy1 = to_copy->copy(); 
-        copy1->doMove(to_move, self); 
-        std::cerr << "first_move " << to_move->getX() << to_move->getY() << endl;
-        for (int i = 0; i < 8; i++) 
-        {
-	        for (int j = 0; j < 8; j++) 
-            {
-    	        Move move(i, j);
-	            if (copy1->checkMove(&move, other))
-                {
-		            moves.push_back(move);        
+        copy->doMove(to_move, self); 
+        // std::cerr << "first_move " << to_move->getX()
+	//  	  << to_move->getY() << endl;
 
-                }
-	        }
-        }
+	moves = possibleMoves(copy, other);
+
+	// print out potential moves
+	// std::cerr << "potential moves: " << std::endl;
+	// for (unsigned int i = 0; i < moves.size(); i++)
+	//     std::cerr << moves[i]->getX() << ", "
+	// 	      << moves[i]->getY() << std::endl;
+
         for (unsigned int i = 0; i < moves.size(); i++)
         {
-            std::cerr << "potential " << moves[i].getX() << moves[i].getY() << std::endl;
-            new_score = minimax(copy1, &moves[i], depth-1, BLACK);
-            if (new_score > score)
-            {
+            // std::cerr << "plays: " << moves[i]->getX() 
+	    //    	      << moves[i]->getY() << std::endl;
+            new_score = -minimax(copy, moves[i], depth-1, other);
+
+            if (new_score < score)
                 score = new_score;
-            } 
+	    delete moves[i];
         }
-        delete copy1;
+        delete copy;
         return score; 
     }
 
     if (player != self)
     {
-        score = 100;
-        Board *copy2 = to_copy->copy(); 
-        copy2->doMove(to_move, other); 
-        std::cerr << "black move " << to_move->getX() << to_move->getY() << endl;
-        for (int i = 0; i < 8; i++) 
-        {
-	        for (int j = 0; j < 8; j++) 
-            {
-    	        Move move(i, j);
-	            if (copy2->checkMove(&move, self))
-                {
-		            moves.push_back(move);    
-            std::cerr << "array " << moves[i].getX() << moves[i].getY() << std::endl;   
-                }
-	        }
-        }
-        for (unsigned int i = 0; i < moves.size(); i++)
-        {    
-            std::cerr << "black pot " << moves[i].getX() << moves[i].getY() << std::endl;
-            new_score = minimax(copy2, &moves[i], depth-1, WHITE);
-            if (new_score < score)
-            {
-                score = new_score;
-            } 
-        }
-        delete copy2;
+        copy->doMove(to_move, other); 
+
+	moves = possibleMoves(copy, self);
+	for (unsigned int i = 0; i < moves.size(); i++)
+	{    
+	    new_score = minimax(copy, moves[i], depth-1, self);
+	    
+	    if (new_score < score)
+		score = new_score;
+	    
+	    delete moves[i];
+	}
+        delete copy;
         return score;
     }
-    
+
     return 0;
 }
 

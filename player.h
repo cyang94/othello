@@ -12,8 +12,10 @@ class Player {
 private:
     Side self;
     Side other;
+    vector<Move*> moves_made;
 
-    vector<Move> possibleMoves(); // list of possible moves
+    // determines list of possible moves
+    vector<Move*> possibleMoves(Board *board, Side player);
 
 public:
     Player(Side side);
