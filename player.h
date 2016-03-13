@@ -2,7 +2,6 @@
 #define __PLAYER_H__
 
 #include <iostream>
-#include <vector>
 #include "common.h"
 #include "board.h"
 using namespace std;
@@ -13,9 +12,6 @@ private:
     Side self;
     Side other;
     vector<Move*> moves_made;
-
-    // determines list of possible moves
-    vector<Move*> possibleMoves(Board *board, Side player);
 
 public:
     Player(Side side);

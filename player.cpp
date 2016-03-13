@@ -15,14 +15,6 @@
  * within 30 seconds.
  */
 Player::Player(Side side) {
-    // Will be set to true in test_minimax.cpp.
-    testingMinimax = false;
-
-    /* 
-     * TODO: Do any initialization you need to do here (setting up the board,
-     * precalculating things, etc.) However, remember that you will only have
-     * 30 seconds.
-     */
     b = new Board();
     self = side;
     other = (self == BLACK) ? WHITE : BLACK;
@@ -54,7 +46,7 @@ Move *Player::doMove(Move *opponentsMove, int msLeft)
     b->doMove(opponentsMove, other);
     if (b->hasMoves(self))
     {
-	vector<Move*> moves = possibleMoves(b, self);
+	vector<Move*> moves = b->possibleMoves(self);
 
         int score = -100; //random negative value 
         int new_score;
@@ -63,16 +55,20 @@ Move *Player::doMove(Move *opponentsMove, int msLeft)
 	for (unsigned int i = 0; i < moves.size(); i++)
         {
 	    new_score = minimax(b, moves[i], 2, self);
+	    //std::cerr << "minscore: " << new_score << endl;
 	    if (new_score > score)
-	    {
+            {
 		score = new_score;
 		move = moves[i];
 	    } 
 	}
 	b->doMove(move, self);
+	// std::cerr << "Making Move: " << move->getX()
+	// 	  << ", " << move->getY() << std::endl;
 	moves_made.push_back(new Move(move->getX(), move->getY()));
 	for (unsigned int i = 0; i < moves.size(); i++)
 	    delete moves[i];
+
 	return moves_made.back();
     }
     else
@@ -84,28 +80,6 @@ Move *Player::doMove(Move *opponentsMove, int msLeft)
 
 
 /*
- * Populates a list of legal moves possible for player
- */
-vector<Move*> Player::possibleMoves(Board *board, Side player) 
-{
-    vector<Move*> moves;
-
-    // check for null
-    //b->checkMove(NULL, self);
-    // check for possible moves
-    for (int i = 0; i < 8; i++) 
-    {
-	for (int j = 0; j < 8; j++) 
-        {
-    	    Move *move = new Move(i, j);
-	    if (board->checkMove(move, player))
-		moves.push_back(move);
-	}
-    }
-    return moves;
-}
-
-/*
  *    Returns the minimax function result of the best move to play that
  *  maximizes the minimum gain of the player.
  */
@@ -115,33 +89,55 @@ vector<Move*> Player::possibleMoves(Board *board, Side player)
     int new_score, score = 100;
     Board *copy = to_copy->copy();
 
-    //std::cerr << "current depth: " << depth << std::endl;
+    // std::cerr << "current depth: " << depth << std::endl;
     if (depth == 1)
     {
-        copy->doMove(to_move, player);    
-        int final_score = copy->doHeuristic(to_move, player);
+	int final_score;
+	if (to_move != NULL)
+	{
+	    copy->doMove(to_move, player); 
+	    final_score = copy->naiveHeuristic(self);
+	}
+	else
+	    final_score = copy->naiveHeuristic(self);
+	    
+	//std::cerr << "final score: " << final_score << std::endl;
         delete copy;
         return final_score;
     }
     
-    if (player == self)
+   if (player == self)
     {
-        copy->doMove(to_move, self); 
-        // std::cerr << "first_move " << to_move->getX()
-	//  	  << to_move->getY() << endl;
+	if (to_move != NULL)
+	{
+	    // std::cerr << "PLAYER plays: " << to_move->getX()
+	    //  	      << ", " << to_move->getY() << std::endl;
+	    copy->doMove(to_move, self); 
+	}
 
-	moves = possibleMoves(copy, other);
+	moves = copy->possibleMoves(other);
 
 	// print out potential moves
-	// std::cerr << "potential moves: " << std::endl;
+	// std::cerr << "PLAYER potential moves: " << std::endl;
 	// for (unsigned int i = 0; i < moves.size(); i++)
 	//     std::cerr << moves[i]->getX() << ", "
 	// 	      << moves[i]->getY() << std::endl;
 
+	if (moves.size() == 0)
+	{
+	    // std::cerr << "NO POSSIBLE MOVES FOR PLAYER " << player << std::endl;
+	    new_score = minimax(copy, NULL, depth-1, other);
+	    if (new_score < score)
+		score = new_score;
+
+	    delete copy;
+	    return score;
+	}
+
         for (unsigned int i = 0; i < moves.size(); i++)
         {
-            // std::cerr << "plays: " << moves[i]->getX() 
-	    //    	      << moves[i]->getY() << std::endl;
+	    // std::cerr << "BLACK plays: " << moves[i]->getX()
+	    // 	      << ", " << moves[i]->getY() << std::endl;
             new_score = minimax(copy, moves[i], depth-1, other);
 
             if (new_score < score)
@@ -154,11 +150,34 @@ vector<Move*> Player::possibleMoves(Board *board, Side player)
 
     if (player != self)
     {
-        copy->doMove(to_move, other); 
+	if (to_move != NULL)
+	{
+	    // std::cerr << "BLACK plays: " << to_move->getX()
+	    // 	      << ", " << to_move->getY() << std::endl;
+	    copy->doMove(to_move, other);
+	} 
 
-	moves = possibleMoves(copy, self);
+	moves = copy->possibleMoves(self);
+
+	// std::cerr << "WHITE potential moves: " << std::endl;
+	// for (unsigned int i = 0; i < moves.size(); i++)
+	//     std::cerr << moves[i]->getX() << ", "
+	// 	      << moves[i]->getY() << std::endl;
+
+	if (moves.size() == 0) // pass turn
+	{
+	    new_score = minimax(copy, NULL, depth-1, self);
+	    if (new_score < score)
+		score = new_score;
+
+	    delete copy;
+	    return score;
+	}
+
 	for (unsigned int i = 0; i < moves.size(); i++)
 	{    
+	    // std::cerr << "WHITE plays: " << moves[i]->getX()
+	    // 	      << ", " << moves[i]->getY() << std::endl;
 	    new_score = minimax(copy, moves[i], depth-1, self);
 	    
 	    if (new_score < score)

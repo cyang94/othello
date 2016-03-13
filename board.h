@@ -2,6 +2,7 @@
 #define __BOARD_H__
 
 #include <bitset>
+#include <vector>
 #include "common.h"
 using namespace std;
 
@@ -32,6 +33,9 @@ public:
     void setBoard(char data[]);
     int naiveHeuristic(Side player);
     int doHeuristic(Move *move, Side player);
+
+    // list of possible moves for player
+    vector<Move*> possibleMoves(Side player);
 };
 
 #endif

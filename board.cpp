@@ -207,7 +207,8 @@ int Board::naiveHeuristic(Side player)
  * Calculates the board Heuristic score for the given possible moves. 
  */
 int Board::doHeuristic(Move *move, Side player) 
-{ 
+{
+    int numplays = countBlack() + countWhite();
     // positional strategy with emphasis on edges and corners
     int static_score[8][8] = 
                   {{20, -3, 11,  8, 8, 11, -3, 20}, 
@@ -222,11 +223,41 @@ int Board::doHeuristic(Move *move, Side player)
 
     // OPTION: other heuristics that can be implemented:
 
-    //mobility strategy
-    int
+    // mobility strategy
+    //vector <Move*> moves = possibleMoves(player);
+    //int mscore = moves.size();
+    
+
+    // maximum disc strategy
+
+
+
     // reduce frontier discs, mobility, stable discs, maximum discs strategy,
     // and parity (number of empty squares where even is bad)
 
+    int score = pscore; //+ mscore;
     return score;
 
+}
+
+/*
+ * Populates a list of legal moves possible for player
+ */
+vector<Move*> Board::possibleMoves(Side player) 
+{
+    vector<Move*> moves;
+
+    // check for null
+    //b->checkMove(NULL, self);
+    // check for possible moves
+    for (int i = 0; i < 8; i++) 
+    {
+	for (int j = 0; j < 8; j++) 
+        {
+    	    Move *move = new Move(i, j);
+	    if (checkMove(move, player))
+		moves.push_back(move);
+	}
+    }
+    return moves;
 }
