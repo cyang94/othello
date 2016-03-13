@@ -31,7 +31,7 @@ public:
 
     void setBoard(char data[]);
     int naiveHeuristic(Side player);
-    int doHeuristic(Move *move);
+    int doHeuristic(Move *move, Side player);
 };
 
 #endif

@@ -56,52 +56,20 @@ Move *Player::doMove(Move *opponentsMove, int msLeft)
     {
 	vector<Move*> moves = possibleMoves(b, self);
 
-        /*For testing and printing out all possible moves         
-        for (unsigned int i = 0; i < moves.size(); i++)
-        {
-            std::cerr << moves[i].getX() << " " << moves[i].getY() << std::endl;
-        }
-        */ 
-
         int score = -100; //random negative value 
         int new_score;
         Move *move = moves[0];
 
-        if (testingMinimax)
+	for (unsigned int i = 0; i < moves.size(); i++)
         {
-            for (unsigned int i = 0; i < moves.size(); i++)
-            {
-                new_score = minimax(b, moves[i], 2, self);
-		
-                if (new_score > score)
-                {
-                    score = new_score;
-                    move = moves[i];
-                } 
-            }
-            b->doMove(move, self);
-	    moves_made.push_back(new Move(move->getX(), move->getY()));
-	    for (unsigned int i = 0; i < moves.size(); i++)
-		delete moves[i];
-            return moves_made.back();
-        }
-    
-        score = b->doHeuristic(moves[0]);
-        // *move = Move(moves[0].getX(), moves[0].getY());
-        // std::cerr << "past move: " << move->getX()
-	// 	  << " , " << move->getY() << endl;
-        // std::cerr << "past score: " << score << endl;
-        for (unsigned int i = 1; i < moves.size(); i++)
-        {
-            new_score = b->doHeuristic(moves[i]);
-            if (new_score > score)
-            {
-                score = new_score;
-                move = moves[i];
-            } 
-        }
-
-        b->doMove(move, self);
+	    new_score = minimax(b, moves[i], 2, self);
+	    if (new_score > score)
+	    {
+		score = new_score;
+		move = moves[i];
+	    } 
+	}
+	b->doMove(move, self);
 	moves_made.push_back(new Move(move->getX(), move->getY()));
 	for (unsigned int i = 0; i < moves.size(); i++)
 	    delete moves[i];
@@ -151,7 +119,7 @@ vector<Move*> Player::possibleMoves(Board *board, Side player)
     if (depth == 1)
     {
         copy->doMove(to_move, player);    
-        int final_score = copy->naiveHeuristic(player);
+        int final_score = copy->doHeuristic(to_move, player);
         delete copy;
         return final_score;
     }

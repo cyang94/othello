@@ -205,7 +205,7 @@ int Board::naiveHeuristic(Side player)
 /*
  * Calculates the board Heuristic score for the given possible moves. 
  */
-int Board::doHeuristic(Move *move) 
+int Board::doHeuristic(Move *move, Side player) 
 { 
     // positional strategy with emphasis on edges and corners
     int static_score[8][8] = 
@@ -217,10 +217,12 @@ int Board::doHeuristic(Move *move)
                    {11, -4,  2,  2, 2,  2, -4, 11},   
                    {-3, -7, -4,  1, 1, -4, -7, -3},
                    {20, -3, 11,  8, 8, 11, -3, 20}};
-    int score = static_score[move->getX()][move->getY()];
+    int pscore = static_score[move->getX()][move->getY()];
 
     // OPTION: other heuristics that can be implemented:
 
+    //mobility strategy
+    int
     // reduce frontier discs, mobility, stable discs, maximum discs strategy,
     // and parity (number of empty squares where even is bad)
 
