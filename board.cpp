@@ -208,7 +208,14 @@ int Board::naiveHeuristic(Side player)
  */
 int Board::doHeuristic(Move *move, Side player) 
 {
-    int numplays = countBlack() + countWhite();
+    int score;
+    if (move == NULL)
+    {
+	score = naiveHeuristic(player);
+	return score;
+    }
+    // int numplays = countBlack() + countWhite();
+
     // positional strategy with emphasis on edges and corners
     int static_score[8][8] = 
                   {{20, -3, 11,  8, 8, 11, -3, 20}, 
@@ -235,8 +242,8 @@ int Board::doHeuristic(Move *move, Side player)
     // reduce frontier discs, mobility, stable discs, maximum discs strategy,
     // and parity (number of empty squares where even is bad)
 
-    int score = pscore; //+ mscore;
-    return score;
+    score = pscore; //+ mscore;
+    return pscore;
 
 }
 

@@ -22,6 +22,8 @@ public:
     // Flag to tell if the player is running within the test_minimax context
     bool testingMinimax;
     Board *b;
+    int negamax(Board *to_copy, Move *to_move, int depth, Side player,
+		int alpha, int beta);
     int minimax(Board *to_copy, Move *to_move, int depth, Side player);
 
 };
