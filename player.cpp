@@ -142,7 +142,7 @@ vector<Move*> Player::possibleMoves(Board *board, Side player)
         {
             // std::cerr << "plays: " << moves[i]->getX() 
 	    //    	      << moves[i]->getY() << std::endl;
-            new_score = -minimax(copy, moves[i], depth-1, other);
+            new_score = minimax(copy, moves[i], depth-1, other);
 
             if (new_score < score)
                 score = new_score;
