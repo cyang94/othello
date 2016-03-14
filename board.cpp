@@ -217,15 +217,15 @@ int Board::doHeuristic(Move *move, Side player)
 
     if (move == NULL)
     {
-	    score = naiveHeuristic(player);
-	    return score;
+	score = naiveHeuristic(player);
+	return score;
     }
 
     // endgame greedy heuristic
 
     else if (numplays >= 45)
     {
-	    greedy_score = naiveHeuristic(player);
+	greedy_score = naiveHeuristic(player);
         return greedy_score;
     }
 
@@ -243,17 +243,14 @@ int Board::doHeuristic(Move *move, Side player)
                    {-20, -50, -6,  -4, -4, -6, -50, -20},
                    {100, -20, 20,  10, 10, 20, -20, 100}};
 
-
-
     for (int i = 0; i < 8; i++) 
     {
-	    for (int j = 0; j < 8; j++) 
+	for (int j = 0; j < 8; j++) 
         {
             if(onBoard(i, j))
             {
                if(get(other, i, j))
-               {
-                
+               {  
                    pscore += -static_score[i][j];
                }
                else 
@@ -270,13 +267,11 @@ int Board::doHeuristic(Move *move, Side player)
     
     // mobility strategy
 
-    vector <Move*> moves = possibleMoves(player);
-    int m_my_score = moves.size();
+    int m_my_score = numMoves(player);
     
     if (numplays < 50)
     {
-    vector <Move*> other_moves = possibleMoves(other);
-    int m_opp_score = other_moves.size();
+    int m_opp_score = numMoves(other);
 
     if (get(player, 0, 0))
         my_corner++;
@@ -338,4 +333,19 @@ vector<Move*> Board::possibleMoves(Side player)
 	}
     }
     return moves;
+}
+
+int Board::numMoves(Side player)
+{
+    int nmoves = 0;
+    for (int i = 0; i < 8; i++) 
+    {
+	for (int j = 0; j < 8; j++) 
+        {
+    	    Move *move = new Move(i, j);
+	    if (checkMove(move, player))
+		nmoves++;
+	}
+    }
+    return nmoves;
 }

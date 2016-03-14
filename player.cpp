@@ -69,7 +69,9 @@ Move *Player::doMove(Move *opponentsMove, int msLeft)
 	// 	  << ", " << move->getY() << std::endl;
 	moves_made.push_back(new Move(move->getX(), move->getY()));
 	for (unsigned int i = 0; i < moves.size(); i++)
+	{
 	    delete moves[i];
+	}
 
 	return moves_made.back();
     }
@@ -149,7 +151,9 @@ int Player::negamax(Board *to_copy, Move *to_move, int depth, Side player,
     }
 
     for (unsigned int i = 0; i < moves.size(); i++)
+    {
 	delete moves[i];
+    }
 
     delete copy;
     return alpha; 

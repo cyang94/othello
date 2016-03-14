@@ -36,6 +36,7 @@ public:
 
     // list of possible moves for player
     vector<Move*> possibleMoves(Side player);
+    int numMoves(Side player); // num moves possible for player
 };
 
 #endif
