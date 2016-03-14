@@ -208,42 +208,113 @@ int Board::naiveHeuristic(Side player)
  */
 int Board::doHeuristic(Move *move, Side player) 
 {
-    int score;
+    int score = 0, pscore = 0, m_score = 0, greedy_score = 0, evap_score = 0;
+    int my_corner = 0, other_corner = 0;
+    Side other = (player == BLACK) ? WHITE : BLACK;
+    int numplays = countBlack() + countWhite() - 4;
+    //std::cerr << "numplays: " << numplays << endl;
+    // if player can't move
+
     if (move == NULL)
     {
-	score = naiveHeuristic(player);
-	return score;
+	    score = naiveHeuristic(player);
+	    return score;
     }
-    // int numplays = countBlack() + countWhite();
+
+    // endgame greedy heuristic
+
+    else if (numplays >= 45)
+    {
+	    greedy_score = naiveHeuristic(player);
+        return greedy_score;
+    }
 
     // positional strategy with emphasis on edges and corners
+    else if (numplays < 30)
+    {
     int static_score[8][8] = 
-                  {{20, -3, 11,  8, 8, 11, -3, 20}, 
-                   {-3, -7, -4,  1, 1, -4, -7, -3},
-                   {11, -4,  2,  2, 2,  2, -4, 11},
-                   { 8,  1,  2, -3, -3, 2,  1,  8},
-                   { 8,  1,  2, -3, -3, 2,  1,  8},
-                   {11, -4,  2,  2, 2,  2, -4, 11},   
-                   {-3, -7, -4,  1, 1, -4, -7, -3},
-                   {20, -3, 11,  8, 8, 11, -3, 20}};
-    int pscore = static_score[move->getX()][move->getY()];
+
+                  {{100, -20, 20,  10, 10, 20, -20, 100}, 
+                   {-20, -50, -6,  -4, -4, -6, -50, -20},
+                   {20,   -6,  7,  4, 4,  7,   -6, 20},
+                   { 10,  -4,  4,  0, 0,  4,   -4,  10},
+                   { 10,  -4,  4,  0, 0,  4,   -4,  10},
+                   { 20,  -6,  7,  4, 4,  7,   -6, 20},
+                   {-20, -50, -6,  -4, -4, -6, -50, -20},
+                   {100, -20, 20,  10, 10, 20, -20, 100}};
+
+
+
+    for (int i = 0; i < 8; i++) 
+    {
+	    for (int j = 0; j < 8; j++) 
+        {
+            if(onBoard(i, j))
+            {
+               if(get(other, i, j))
+               {
+                
+                   pscore += -static_score[i][j];
+               }
+               else 
+               {
+                   pscore += static_score[i][j];
+               }
+            }
+	    }
+    }
+    }
+
 
     // OPTION: other heuristics that can be implemented:
-
-    // mobility strategy
-    //vector <Move*> moves = possibleMoves(player);
-    //int mscore = moves.size();
     
+    // mobility strategy
 
-    // maximum disc strategy
+    vector <Move*> moves = possibleMoves(player);
+    int m_my_score = moves.size();
+    
+    if (numplays < 50)
+    {
+    vector <Move*> other_moves = possibleMoves(other);
+    int m_opp_score = other_moves.size();
+
+    if (get(player, 0, 0))
+        my_corner++;
+    else if (get(other, 0, 8))
+        other_corner++;
+    if (get(player, 0, 8))
+        my_corner++;
+    else if (get(other, 8, 0))
+        other_corner++;
+    if (get(player, 8, 0))
+        my_corner++;
+    else if (get(other, 8, 0))
+        other_corner++;
+    if (get(player, 8, 8))
+        my_corner++;
+    else if (get(other, 8, 8))
+        other_corner++;
+    
+        
+    m_score = 15 * (my_corner - other_corner) + 4 * (m_my_score - m_opp_score);
+    }
+
+    // check evaporation
+
+    if (m_my_score == 0)
+    {
+        evap_score = 15 * naiveHeuristic(player);
+    }
 
 
 
     // reduce frontier discs, mobility, stable discs, maximum discs strategy,
     // and parity (number of empty squares where even is bad)
 
-    score = pscore; //+ mscore;
-    return pscore;
+    //std::cerr << "pscore: " << pscore << endl;
+    //std::cerr << "mobility score: " << m_score << endl;
+    score = pscore + 10 * m_score + 12 * greedy_score  + evap_score;
+    return score;
 
 }
 

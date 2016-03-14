@@ -18,6 +18,7 @@ Player::Player(Side side) {
     b = new Board();
     self = side;
     other = (self == BLACK) ? WHITE : BLACK;
+    testingMinimax = 0;
 }
 
 /*
@@ -48,17 +49,17 @@ Move *Player::doMove(Move *opponentsMove, int msLeft)
     {
 	vector<Move*> moves = b->possibleMoves(self);
 
-        int score = -100; //random negative value 
+        int score = -2000; //random negative value 
         int new_score;
         Move *move = moves[0];
 
 	for (unsigned int i = 0; i < moves.size(); i++)
         {
 	    // new_score = minimax(b, moves[i], 2, self);
-	    new_score = negamax(b, moves[i], 2, self, -100, 100);
+	    new_score = negamax(b, moves[i], 4, self, -2000, 2000);
 	    // std::cerr << "minscore: " << new_score << endl;
 	    if (new_score > score)
-            {
+        {
 		score = new_score;
 		move = moves[i];
 	    } 
@@ -86,19 +87,20 @@ Move *Player::doMove(Move *opponentsMove, int msLeft)
 int Player::negamax(Board *to_copy, Move *to_move, int depth, Side player,
 		    int alpha, int beta)
 {
+
     vector<Move*> moves;
     int new_score;
     Board *copy = to_copy->copy();
 
     Side opp = (player == self) ? other : self;
-    // std::cerr << "Current Depth: " << depth << std::endl;
-    // std::cerr << "PLAYER: " << player << " OPP: " << opp << std::endl;
+    //std::cerr << "Current Depth: " << depth << std::endl;
+    //std::cerr << "PLAYER: " << player << " OPP: " << opp << std::endl;
 
     if (depth == 0)
     {
-	int final_score;
-	
-	final_score = copy->doHeuristic(to_move, player);
+	    int final_score;
+	    copy->doMove(to_move, player); 
+	    final_score = copy->doHeuristic(to_move, player);
 	
 	// std::cerr << "final score: " << final_score << endl;
 	    
@@ -110,7 +112,7 @@ int Player::negamax(Board *to_copy, Move *to_move, int depth, Side player,
     {
 	// std::cerr << "PLAYER plays: " << to_move->getX() << ", "
 	//    	  << to_move->getY() << std::endl;
-	copy->doMove(to_move, player); 
+	    copy->doMove(to_move, player); 
     }
 
     moves = copy->possibleMoves(opp);
@@ -163,8 +165,8 @@ int Player::negamax(Board *to_copy, Move *to_move, int depth, Side player,
     vector<Move*> moves;
     int new_score, score = 100;
     Board *copy = to_copy->copy();
-
-    // std::cerr << "current depth: " << depth << std::endl;
+    std::cerr << "current player: " << depth << std::endl;
+    std::cerr << "current depth: " << depth << std::endl;
     if (depth == 1)
     {
 	int final_score;
