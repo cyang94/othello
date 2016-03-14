@@ -56,7 +56,7 @@ Move *Player::doMove(Move *opponentsMove, int msLeft)
 	for (unsigned int i = 0; i < moves.size(); i++)
         {
 	    // new_score = minimax(b, moves[i], 2, self);
-	    new_score = negamax(b, moves[i], 4, self, -2000, 2000);
+	    new_score = negamax(b, moves[i], 3, self, -2000, 2000);
 	    // std::cerr << "minscore: " << new_score << endl;
 	    if (new_score > score)
         {
